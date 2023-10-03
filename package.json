@@ -1,9 +1,10 @@
 {
   "name": "mytools",
   "version": "1.0",
-  "main": "app.js",
+  "exports": "./app.js",
   "author": "HAIZAKURA",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "start": "node app.js"
   },
