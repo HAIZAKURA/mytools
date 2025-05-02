@@ -4,6 +4,7 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 import log4js from 'log4js';
+import history from 'connect-history-api-fallback';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -27,6 +28,9 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Methods", "GET,POST");
     next();
 });
+app.use(history({
+    index: '/index.html',
+}));
 app.use(express.static(join(__dirname, 'public')));
 
 export { logger };
