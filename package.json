@@ -1,6 +1,6 @@
 {
   "name": "mytools",
-  "version": "1.5",
+  "version": "2.0",
   "exports": "./app.js",
   "author": "HAIZAKURA",
   "license": "MIT",
