@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM --platform=linux/amd64 node:lts-alpine
 EXPOSE 3010
 WORKDIR /home/app
 COPY . /home/app

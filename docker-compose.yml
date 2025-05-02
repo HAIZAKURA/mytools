@@ -2,6 +2,7 @@ version: "2"
 services:
   node:
     image: "node:lts-alpine"
+    platform: linux/amd64
     user: "node"
     working_dir: /home/app
     environment:
