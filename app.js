@@ -18,7 +18,7 @@ app.use(log4js.connectLogger(
     logger, 
     {
         level: 'auto',
-        format: ':remote-addr ":method :url" :status ":user-agent"' 
+        format: ':remote-addr ":method :url" :status ":user-agent"',
     }
 ));
 app.use(bodyParser.json());
