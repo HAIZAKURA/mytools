@@ -48,7 +48,7 @@ router.get('', (req, res) => {
                 if (element.transCur == transCur & element.baseCur == baseCur) {
                     res.json({
                         code: 200,
-                        data: element
+                        data: element,
                     })
                     return;
                 };
@@ -56,16 +56,12 @@ router.get('', (req, res) => {
         })
         .catch(err => {
             logger.error('Error:', err);
-            res.json({
-                code: 400
-            });
+            res.sendStatus(400);
             return;
         });
     } catch (error) {
         logger.error('Error:', error);
-        res.json({
-            code: 502
-        });
+        res.sendStatus(502);
         return;
     };
 });
