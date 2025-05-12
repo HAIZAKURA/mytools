@@ -20,7 +20,7 @@ const router = express.Router();
 /**
  * get rate
  * request.query = year, month, day, transCur, baseCur
- * response.body = { 'code': code, 'data': '' }
+ * response.body = { 'data': '' }
  */
 router.get('', (req, res) => {
     try {
@@ -46,8 +46,7 @@ router.get('', (req, res) => {
             let exchangeRateJson = data.data.exchangeRateJson;
             exchangeRateJson.forEach(element => {
                 if (element.transCur == transCur & element.baseCur == baseCur) {
-                    res.json({
-                        code: 200,
+                    res.status(200).json({
                         data: element,
                     })
                     return;
