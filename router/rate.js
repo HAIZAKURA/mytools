@@ -50,7 +50,7 @@ router.get('', (req, res) => {
                         data: element,
                     })
                     return;
-                };
+                }
             });
         })
         .catch(err => {
