@@ -19,13 +19,13 @@ app.use(log4js.connectLogger(
     {
         level: 'auto',
         format: ':remote-addr ":method :url" :status ":user-agent"',
-    }
+    },
 ));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST");
+    res.setHeader("Access-Control-Allow-Methods", "GET");
     next();
 });
 app.use(history({

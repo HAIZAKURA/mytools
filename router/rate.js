@@ -36,33 +36,33 @@ router.get('', (req, res) => {
             month = month < 10 ? '0' + month : month;
             day = today.getDate();
             day = day < 10 ? '0' + day : day;
-        };
+        }
         if (!transCur || !baseCur) {
             transCur = 'JPY';
             baseCur = 'CNY';
-        };
+        }
         axios.get('https://www.unionpayintl.com/upload/jfimg/' + year + month + day + '.json')
-        .then(data => {
-            let exchangeRateJson = data.data.exchangeRateJson;
-            exchangeRateJson.forEach(element => {
-                if (element.transCur == transCur & element.baseCur == baseCur) {
-                    res.status(200).json({
-                        data: element,
-                    })
-                    return;
-                }
+            .then(data => {
+                let exchangeRateJson = data.data.exchangeRateJson;
+                exchangeRateJson.forEach(element => {
+                    if (element.transCur == transCur & element.baseCur == baseCur) {
+                        res.status(200).json({
+                            data: element,
+                        });
+                        return;
+                    }
+                });
+            })
+            .catch(error => {
+                logger.error('Error:', error);
+                res.sendStatus(400);
+                return;
             });
-        })
-        .catch(err => {
-            logger.error('Error:', err);
-            res.sendStatus(400);
-            return;
-        });
     } catch (error) {
         logger.error('Error:', error);
         res.sendStatus(502);
         return;
-    };
+    }
 });
 
 /** Rate Router End **/
