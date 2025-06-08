@@ -8,44 +8,35 @@ executors:
 
 jobs:
   build_and_push:
-    docker:
-      - image: cimg/node:lts
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
+    executor: node_lts
     steps:
       - checkout
-
       - restore_cache:
-        name: Restore pnpm Package Cache
-        keys:
+          name: Restore pnpm Package Cache
+          keys:
             - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
-
       - run:
-        name: Install pnpm package manager
-        command: |
-          npm install --global corepack@latest
-          corepack enable
-          corepack prepare pnpm@latest-10 --activate
-          pnpm config set store-dir .pnpm-store
-
+          name: Install pnpm package manager
+          command: |
+            npm install --global corepack@latest
+            corepack enable
+            corepack prepare pnpm@latest-10 --activate
+            pnpm config set store-dir .pnpm-store
       - run:
           name: Clone front-end source code
           command: |
             git clone https://github.com/HAIZAKURA/mytools-vue.git
             cd mytools-vue
       - run:
-        name: Install Dependencies and Build
-        command: |
-          pnpm install
-          pnpm build
-
+          name: Install Dependencies and Build
+          command: |
+            pnpm install
+            pnpm build
       - save_cache:
-        name: Save pnpm Package Cache
-        key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
-        paths:
-          - .pnpm-store
-
+          name: Save pnpm Package Cache
+          key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - .pnpm-store
       - run:
           name: Move front-end build files
           command: |
