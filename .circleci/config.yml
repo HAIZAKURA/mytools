@@ -8,64 +8,49 @@ executors:
 
 jobs:
   build_and_push:
-    docker:
-      - image: cimg/node:22.16
+    executor: node22
     steps:
       - checkout
-
       - run:
-          name: Clone front-end source code
-          command: |
-            git clone https://github.com/HAIZAKURA/mytools-vue.git
-            cd mytools-vue
-
-      - restore_cache:
-        name: Restore pnpm Package Cache
-        keys:
-          - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
-
-      - run:
-        name: Install pnpm package manager
+        name: Clone front-end source code
         command: |
-          npm install --global corepack@latest
-          corepack enable
-          corepack prepare pnpm@latest-10 --activate
-          pnpm config set store-dir .pnpm-store
+          git clone https://github.com/HAIZAKURA/mytools-vue.git
+          cd mytools-vue
 
+      - run:
+          name: Install pnpm package manager
+          command: |
+            npm install --global corepack@latest
+            corepack enable
+            corepack prepare pnpm@latest-10 --activate
+            pnpm config set store-dir .pnpm-store
       - run:
         name: Install Dependencies and Build
         command: |
           pnpm install
-          pnpm build
-
-      - save_cache:
-        name: Save pnpm Package Cache
-        key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
-        paths:
-          - .pnpm-store
+          pnpm run build
 
       - run:
           name: Move front-end build files
           command: |
-            mv mytools-vue/dist ./public
+            mv dist ../public
 
       - run:
           name: Delete front-end source code
-          command: rm -rf mytools-vue
+          command: |
+            cd ..
+            rm -rf mytools-vue
 
       - setup_remote_docker
-
       - run:
-        name: Login to Docker Hub
-        command: |
-          echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-
+          name: Login to Docker Hub
+          command: |
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
       - run:
           name: Build Docker image
           command: |
             TAG=3.0.$CIRCLE_BUILD_NUM
             docker build -t $DOCKERHUB_USERNAME/mytools-vue:$TAG .
-
       - run:
           name: Push Docker image
           command: |
