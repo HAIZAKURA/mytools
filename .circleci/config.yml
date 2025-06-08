@@ -7,10 +7,12 @@ executors:
     working_directory: ~/app
 
 jobs:
-  build_and_push:
-    executor: node22
+  init:
     steps:
       - checkout
+  build_frontend:
+    executor: node22
+    steps:
       - run:
           name: Clone front-end source code
           command: |
@@ -29,14 +31,11 @@ jobs:
             cd ./mytools-vue
             pnpm install
             pnpm run build
-      - run:
-          name: Move front-end build files
-          command: |
-            mv ./mytools-vue/dist ../public
-      - run:
-          name: Delete front-end source code
-          command: |
+            mv ./dist ../public
+            cd ..
             rm -rf mytools-vue
+  build_and_push_image:
+    steps:
       - setup_remote_docker
       - run:
           name: Login to Docker Hub
@@ -46,14 +45,16 @@ jobs:
           name: Build Docker image
           command: |
             TAG=3.0.$CIRCLE_BUILD_NUM
-            docker build -t $DOCKERHUB_USERNAME/mytools-vue:$TAG .
+            docker build -t $DOCKERHUB_USERNAME/mytools:$TAG .
       - run:
           name: Push Docker image
           command: |
             TAG=3.0.$CIRCLE_BUILD_NUM
-            docker push $DOCKERHUB_USERNAME/mytools-vue:$TAG
+            docker push $DOCKERHUB_USERNAME/mytools:$TAG
 
 workflows:
   build_and_deploy:
     jobs:
-      - build_and_push
+      - init
+      - build_frontend
+      - build_and_push_image
