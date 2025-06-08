@@ -7,10 +7,12 @@ executors:
     working_directory: ~/app
 
 jobs:
-  build_and_push:
-    executor: node22
+  init:
     steps:
       - checkout
+  build_frontend:
+    executor: node22
+    steps:
       - run:
           name: Clone front-end source code
           command: |
@@ -32,6 +34,8 @@ jobs:
             mv ./dist ../public
             cd ..
             rm -rf mytools-vue
+  build_and_push_image:
+    steps:
       - setup_remote_docker
       - run:
           name: Login to Docker Hub
@@ -51,4 +55,6 @@ jobs:
 workflows:
   build_and_deploy:
     jobs:
-      - build_and_push
+      - init
+      - build_frontend
+      - build_and_push_image
