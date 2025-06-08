@@ -23,9 +23,15 @@ jobs:
             corepack enable
             corepack prepare pnpm@latest-10 --activate
             pnpm config set store-dir .pnpm-store
+      - persist_to_workspace:
+          root: .
+          paths:
+            - mytools-vue
   front-build:
     executor: node22
     steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Install Deps and Build front-end
           command: |
@@ -35,6 +41,8 @@ jobs:
   front-deploy:
     executor: node22
     steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Deploy front-end
           command: |
@@ -44,6 +52,8 @@ jobs:
   docker-build:
     executor: node22
     steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Build Docker image
           command: |
@@ -52,6 +62,8 @@ jobs:
   docker-push:
     executor: node22
     steps:
+      - attach_workspace:
+          at: .
       - setup_remote_docker
       - run:
           name: Login to Docker Hub
