@@ -4,7 +4,6 @@ executors:
   node22:
     docker:
       - image: cimg/node:22.16
-    working_directory: ~/app
 
 jobs:
   build_and_push:
