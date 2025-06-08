@@ -30,11 +30,10 @@ jobs:
           pnpm config set store-dir .pnpm-store
 
       - run:
-        name: Clone front-end source code
-        command: |
-          git clone https://github.com/HAIZAKURA/mytools-vue.git
-          cd mytools-vue
-
+          name: Clone front-end source code
+          command: |
+            git clone https://github.com/HAIZAKURA/mytools-vue.git
+            cd mytools-vue
       - run:
         name: Install Dependencies and Build
         command: |
@@ -48,25 +47,19 @@ jobs:
           - .pnpm-store
 
       - run:
-        name: Move front-end build files
-        command: |
-          mv dist ../public
-
+          name: Move front-end build files
+          command: |
+            mv mytools-vue/dist ./public
       - run:
-        name: Delete front-end source code
-        command: |
-          cd ..
-          rm -rf mytools-vue
-
+          name: Delete front-end source code
+          command: rm -rf mytools-vue
       - setup_remote_docker:
           docker_layer_caching: true
-
       - run:
           name: Build Docker image
           command: |
             TAG=3.0.$CIRCLE_BUILD_NUM
             docker build -t $DOCKERHUB_USERNAME/mytools-vue:$TAG .
-
       - run:
           name: Push Docker image
           command: |
