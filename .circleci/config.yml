@@ -4,6 +4,7 @@ executors:
   node22:
     docker:
       - image: cimg/node:22.16
+    working_directory: ~/app
 
 jobs:
   build_and_push:
@@ -11,26 +12,16 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Clone front-end source code
-          command: git clone https://github.com/HAIZAKURA/mytools-vue.git || cd ./mytools-vue
-      - run:
-          name: Install pnpm package manager
+          name: Build front-end
           command: |
+            git clone https://github.com/HAIZAKURA/mytools-vue.git
+            cd ./mytools-vue
             npm install --global corepack@latest
             corepack enable
             corepack prepare pnpm@latest-10 --activate
             pnpm config set store-dir .pnpm-store
-      - run:
-          name: Install Dependencies and Build
-          command: |
             pnpm install
             pnpm run build
-      - run:
-          name: Move front-end build files
-          command: mv ./dist ../public
-      - run:
-          name: Delete front-end source code
-          command: |
             cd ..
             rm -rf mytools-vue
       - setup_remote_docker
