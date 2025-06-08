@@ -30,6 +30,7 @@ jobs:
   front-build:
     executor: node22
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - run:
@@ -44,9 +45,14 @@ jobs:
             mkdir -p public
             cp -r mytools-vue/dist/* public
             rm -rf mytools-vue
+      - persist_to_workspace:
+          root: .
+          paths:
+            - public
   docker-build:
     executor: node22
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - setup_remote_docker
