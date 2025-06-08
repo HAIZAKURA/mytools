@@ -7,15 +7,12 @@ executors:
     working_directory: ~/app
 
 jobs:
-  init:
+  build_and_push:
     executor: node22
     steps:
       - checkout
-  build_frontend:
-    executor: node22
-    steps:
       - run:
-          name: Clone front-end source code
+          name: Clone Front-end source code
           command: |
             git clone https://github.com/HAIZAKURA/mytools-vue.git
       - run:
@@ -27,7 +24,7 @@ jobs:
             corepack prepare pnpm@latest-10 --activate
             pnpm config set store-dir .pnpm-store
       - run:
-          name: Install Dependencies and Build
+          name: Install Dependencies and Build Front-end
           command: |
             cd ./mytools-vue
             pnpm install
@@ -35,9 +32,6 @@ jobs:
             mv ./dist ../public
             cd ..
             rm -rf mytools-vue
-  build_and_push_image:
-    executor: node22
-    steps:
       - setup_remote_docker
       - run:
           name: Login to Docker Hub
@@ -57,6 +51,4 @@ jobs:
 workflows:
   build_and_deploy:
     jobs:
-      - init
-      - build_frontend
-      - build_and_push_image
+      - build_and_push
