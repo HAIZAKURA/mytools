@@ -38,11 +38,6 @@ jobs:
             cd mytools-vue
             pnpm install
             pnpm run build
-  front-deploy:
-    executor: node22
-    steps:
-      - attach_workspace:
-          at: .
       - run:
           name: Deploy front-end
           command: |
@@ -82,12 +77,9 @@ workflows:
       - front-build:
           requires:
             - init
-      - front-deploy:
-          requires:
-            - front-build
       - docker-build:
           requires:
-            - front-deploy
+            - front-build
       - docker-push:
           requires:
             - docker-build
