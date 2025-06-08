@@ -15,7 +15,7 @@ jobs:
           name: Clone front-end source code
           command: |
             git clone https://github.com/HAIZAKURA/mytools-vue.git
-            cd mytools-vue
+            cd ./mytools-vue
       - run:
           name: Install pnpm package manager
           command: |
@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Move front-end build files
           command: |
-            mv dist ../public
+            mv ./dist ../public
       - run:
           name: Delete front-end source code
           command: |
