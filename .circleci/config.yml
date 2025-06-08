@@ -7,41 +7,56 @@ executors:
     working_directory: ~/app
 
 jobs:
-  build_and_push:
+  init:
     executor: node22
     steps:
       - checkout
       - run:
-          name: Clone Front-end source code
+          name: Clone front-end source code
           command: |
             git clone https://github.com/HAIZAKURA/mytools-vue.git
       - run:
           name: Install pnpm package manager
           command: |
-            cd ./mytools-vue
+            cd mytools-vue
             npm install --global corepack@latest
             corepack enable
             corepack prepare pnpm@latest-10 --activate
             pnpm config set store-dir .pnpm-store
+  front-build:
+    executor: node22
+    steps:
       - run:
-          name: Install Dependencies and Build Front-end
+          name: Install Deps and Build front-end
           command: |
-            cd ./mytools-vue
+            cd mytools-vue
             pnpm install
             pnpm run build
-            mv ./dist ../public
-            cd ..
-            rm -rf mytools-vue
-      - setup_remote_docker
+  front-deploy:
+    executor: node22
+    steps:
       - run:
-          name: Login to Docker Hub
+          name: Deploy front-end
           command: |
-            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+            mkdir -p public
+            cp -r mytools-vue/dist/* public
+            rm -rf mytools-vue
+  docker-build:
+    executor: node22
+    steps:
       - run:
           name: Build Docker image
           command: |
             TAG=2.$CIRCLE_BUILD_NUM
             docker build -t $DOCKERHUB_USERNAME/mytools:$TAG .
+  docker-push:
+    executor: node22
+    steps:
+      - setup_remote_docker
+      - run:
+          name: Login to Docker Hub
+          command: |
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
       - run:
           name: Push Docker image
           command: |
@@ -49,6 +64,18 @@ jobs:
             docker push $DOCKERHUB_USERNAME/mytools:$TAG
 
 workflows:
-  build_and_deploy:
+  build-and-deploy:
     jobs:
-      - build_and_push
+      - init
+      - front-build:
+          requires:
+            - init
+      - front-deploy:
+          requires:
+            - front-build
+      - docker-build:
+          requires:
+            - front-deploy
+      - docker-push:
+          requires:
+            - docker-build
