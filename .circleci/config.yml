@@ -1,25 +1,28 @@
 version: 2.1
 
 executors:
-  node_lts:
+  node22:
     docker:
-      - image: cimg/node:lts
+      - image: cimg/node:22.16
     working_directory: ~/app
 
 jobs:
   build_and_push:
     docker:
-      - image: cimg/node:lts
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
+      - image: cimg/node:22.16
     steps:
       - checkout
+
+      - run:
+          name: Clone front-end source code
+          command: |
+            git clone https://github.com/HAIZAKURA/mytools-vue.git
+            cd mytools-vue
 
       - restore_cache:
         name: Restore pnpm Package Cache
         keys:
-            - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+          - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
 
       - run:
         name: Install pnpm package manager
@@ -29,11 +32,6 @@ jobs:
           corepack prepare pnpm@latest-10 --activate
           pnpm config set store-dir .pnpm-store
 
-      - run:
-          name: Clone front-end source code
-          command: |
-            git clone https://github.com/HAIZAKURA/mytools-vue.git
-            cd mytools-vue
       - run:
         name: Install Dependencies and Build
         command: |
@@ -50,16 +48,24 @@ jobs:
           name: Move front-end build files
           command: |
             mv mytools-vue/dist ./public
+
       - run:
           name: Delete front-end source code
           command: rm -rf mytools-vue
-      - setup_remote_docker:
-          docker_layer_caching: true
+
+      - setup_remote_docker
+
+      - run:
+        name: Login to Docker Hub
+        command: |
+          echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+
       - run:
           name: Build Docker image
           command: |
             TAG=3.0.$CIRCLE_BUILD_NUM
             docker build -t $DOCKERHUB_USERNAME/mytools-vue:$TAG .
+
       - run:
           name: Push Docker image
           command: |
