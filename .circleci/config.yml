@@ -12,7 +12,9 @@ jobs:
       - checkout
       - run:
           name: Clone front-end source code
-          command: git clone https://github.com/HAIZAKURA/mytools-vue.git || cd ./mytools-vue
+          command: |
+            git clone https://github.com/HAIZAKURA/mytools-vue.git
+            cd ./mytools-vue
       - run:
           name: Install pnpm package manager
           command: |
