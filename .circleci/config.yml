@@ -8,6 +8,7 @@ executors:
 
 jobs:
   init:
+    executor: node22
     steps:
       - checkout
   build_frontend:
@@ -35,6 +36,7 @@ jobs:
             cd ..
             rm -rf mytools-vue
   build_and_push_image:
+    executor: node22
     steps:
       - setup_remote_docker
       - run:
